@@ -86,3 +86,45 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+
+class TestDBStorage(unittest.Testcase):
+    """Tests the DBStorage class"""
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def setUp(self):
+        """Sets up test environment"""
+        self.state = State(name=" ")
+        self.state.save()
+        self.city = City(name=" ", state_id=self.state.id)
+        self.city.save()
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def tearDown(self):
+        """Tear down test environment"""
+        storage.delete(self.state)
+        storage.delete(self.city)
+        storage.save()
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """Test the get method in DBStorage."""
+        retrieved_state = storage.get(State, self.state.id)
+        self.assertEqual(retrieved_state, self.state)
+
+        # Test for non-existent object
+        self.assetIsNone(storage.get(State, "non-existent-id"))
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """Tests the count method in DBStorage."""
+        state_count = storage.count(State)
+        self.assertEqual(state_count, 1)
+
+        # Test count without specifying a class
+        total_count = storage.count()
+        self.assertGreaterEqual(total_count, 2)
+
+
+if __name__ == '__main__':
+    unittest.main()

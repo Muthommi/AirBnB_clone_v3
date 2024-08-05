@@ -113,3 +113,40 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    def setUp(self):
+        """Set up test environment"""
+        self.state = State(name=" ")
+        self.state.save()
+        self.city = City(name=" ", state_id=self.state.id)
+        self.city.save()
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def tearDown(self):
+        """Tear down test environment"""
+        storage.delete(self.state)
+        storage.delete(self.city)
+        storage.save()
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self):
+        """Tests the get method in FileStorage."""
+        retrieved_state = storage.get(State, self.state.id)
+        self.assertEqual(retrieved_state, self.state)
+
+        # Test for non-existent object
+        self.assertIsNone(storage.get(State, "non-existent-id"))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self):
+        """Tests the count method in FileStorage"""
+        state_count = storage.count(State)
+        self.assertEqual(state_count, 1)
+
+        # Test count without specifying a class
+        total_count = storage.count()
+        self.assertGreaterEqual(total_count, 2)
+
+
+if __name__ == '__main__':
+    unittest.main()
