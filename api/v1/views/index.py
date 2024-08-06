@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+Creates the route status endpoint
+"""
 
 from flask import jsonify
 from api.v1.views import app_views
